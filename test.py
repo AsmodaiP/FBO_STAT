@@ -16,8 +16,8 @@ if os.path.exists(dotenv_path):
 
 token = os.environ['TOKEN']
 
-date_from = '2022-03-01'
-date_to = '2022-05-25'
+date_from = '2022-05-18'
+date_to = '2022-05-18'
 
 def get_detail_by_period(token, date_from, date_to):
     url = 'https://suppliers-stats.wildberries.ru/api/v1/supplier/reportDetailByPeriod'
@@ -25,7 +25,7 @@ def get_detail_by_period(token, date_from, date_to):
         'key': token,
         'dateFrom': date_from,
         'dateto': date_to,
-        'limit': 300,
+        'limit': 10000,
         'rrdid': 0
     }
     response = requests.get(url, params=params)
@@ -34,13 +34,15 @@ def get_detail_by_period(token, date_from, date_to):
     return 'jsonFBO.txt'
 
 def get_FBO(json_file_fbo, barcode):
+    count = 0
     with open(f'{json_file_fbo}') as f:
         templates = json.load(f)
     for card in templates:
-        if card['barcode'] == barcode and card['office_name'] != "Склад поставщика":
-            print(card['supplier_oper_name'])
+        if card['office_name'] != "Склад поставщика" and card['supplier_oper_name']=='Продажа':
+            count+=1
+    return print("Продаж FBO: ",count)
 
 
-#get_detail_by_period(token, date_from, date_to)
+get_detail_by_period(token, date_from, date_to)
 
-get_FBO('jsonFBO.txt', barcode='2011763633013')
+get_FBO('jsonFBO.txt', barcode='2008082456003')
