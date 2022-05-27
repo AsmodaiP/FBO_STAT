@@ -14,14 +14,14 @@ dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 if os.path.exists(dotenv_path):
     load_dotenv(dotenv_path)
 
-token = os.environ['TOKEN']
+api_key = os.environ['TOKEN']
 
-date_from = '2022-05-18'
-date_to = '2022-05-18'
+today = dt.datetime.date(dt.datetime.now())
+
 
 def get_detail_by_period(token, date_from, date_to):
     url = 'https://suppliers-stats.wildberries.ru/api/v1/supplier/reportDetailByPeriod'
-    params={
+    params = {
         'key': token,
         'dateFrom': date_from,
         'dateto': date_to,
@@ -29,20 +29,27 @@ def get_detail_by_period(token, date_from, date_to):
         'rrdid': 0
     }
     response = requests.get(url, params=params)
-    with open('jsonFBO.txt', 'w') as f:
-        json.dump(response.json(), f,  indent=2, ensure_ascii=False)
-    return 'jsonFBO.txt'
+    with open(f'{today}.json', 'w') as f:
+        json.dump(response.json(), f, indent=2, ensure_ascii=False)
+    return f'{today}.json'
 
-def get_FBO(json_file_fbo, barcode):
+
+def get_FBO(json_file, barcode):
     count = 0
-    with open(f'{json_file_fbo}') as f:
+    index = 0
+    with open(json_file) as f:
         templates = json.load(f)
     for card in templates:
-        if card['office_name'] != "Склад поставщика" and card['supplier_oper_name']=='Продажа':
-            count+=1
-    return print("Продаж FBO: ",count)
+        # поменять продажу а заказы
+        if card['office_name'] != "Склад поставщика" and card['supplier_oper_name'] == 'Продажа':
+            count += 1
+        #if card['office_name'] == "Склад поставщика" or card['supplier_oper_name'] != 'Продажа':
+        #    card.pop(index)
+        #index += 1
+    print("Продаж FBO: ", count)
+    return
 
 
-get_detail_by_period(token, date_from, date_to)
+#get_detail_by_period(api_key, date_from = '2022-05-18', date_to = '2022-05-18')
 
-get_FBO('jsonFBO.txt', barcode='2008082456003')
+get_FBO(json_file=f"{today}.json", barcode='2008082456003')
