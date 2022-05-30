@@ -40,12 +40,10 @@ def get_FBO(json_file, barcode):
     with open(json_file) as f:
         templates = json.load(f)
     for card in templates:
-        # поменять продажу а заказы
+
         if card['office_name'] != "Склад поставщика" and card['supplier_oper_name'] == 'Продажа':
             count += 1
-        #if card['office_name'] == "Склад поставщика" or card['supplier_oper_name'] != 'Продажа':
-        #    card.pop(index)
-        #index += 1
+
     print("Продаж FBO: ", count)
     return
 
